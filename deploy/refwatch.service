@@ -1,0 +1,14 @@
+[Unit]
+Description=refwatch: Claude guest pass watcher
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+WorkingDirectory=/opt/refwatch
+EnvironmentFile=/opt/refwatch/.env
+ExecStart=/opt/refwatch/.venv/bin/python refwatch.py
+Restart=always
+RestartSec=15
+
+[Install]
+WantedBy=multi-user.target
