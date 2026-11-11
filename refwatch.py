@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Callable, Mapping
 
 import httpx
+from dotenv import load_dotenv
 
 log = logging.getLogger("refwatch")
 # httpx logs every request URL at INFO, and the Telegram URL contains the bot token.
@@ -223,6 +224,8 @@ class Watcher:
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
+    # Hosting panels deliver secrets as a .env file next to the code; real env vars win.
+    load_dotenv(Path(__file__).with_name(".env"))
     cfg = Config.from_env()
     with httpx.Client(timeout=15) as client:
         watcher = Watcher(cfg, client, SeenStore(cfg.state_file))

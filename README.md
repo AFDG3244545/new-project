@@ -20,30 +20,36 @@
 1. **X API Bearer Token**: [developer.x.com](https://developer.x.com), создать приложение и пополнить
    кредиты. Тариф pay-per-use, $0.005 за каждый возвращённый пост. Пустые опросы, судя по прайсу,
    бесплатны, но проверьте расход в консоли в первый день.
-2. **Telegram-бот**: создать у [@BotFather](https://t.me/BotFather), написать боту `/start`, затем
-   открыть `https://api.telegram.org/bot<TOKEN>/getUpdates` и взять `message.chat.id`.
+2. **Telegram-бот**:
+   1. Откройте в Telegram [@BotFather](https://t.me/BotFather), отправьте `/newbot`, задайте имя и
+      username (должен заканчиваться на `bot`). В ответе придёт токен вида `123456:ABC…`,
+      это `TELEGRAM_BOT_TOKEN`.
+   2. Откройте своего нового бота и нажмите **Start**, иначе он не сможет вам писать.
+   3. Откройте в браузере `https://api.telegram.org/bot<TOKEN>/getUpdates` и найдите
+      `"chat":{"id":…}`. Это число и есть `TELEGRAM_CHAT_ID`.
 
-## Запуск
+## Запуск на Botkeep
+
+1. В панели [botkeep.cloud](https://botkeep.cloud) создайте сервер с профилем **Python** (3.10 или новее).
+2. Источник **GitHub**: подключите аккаунт, установите Botkeep GitHub App на этот репозиторий,
+   выберите его и ветку с кодом.
+3. Команда запуска `python main.py`. Зависимости ставятся из `requirements.txt`.
+4. В разделе **Environment** добавьте секреты `X_BEARER_TOKEN`, `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`.
+5. Запустите сервер.
+
+Botkeep кладёт значения из Environment в файл `.env` рядом с кодом, бот читает его сам.
+
+При старте бот шлёт в Telegram сообщение «refwatch запущен», а в консоли появляется строка
+`Watching …`. Если вместо этого `Telegram check failed`, проверьте токен, chat id и что вы нажали
+Start у бота.
+
+## Локальный запуск
 
 ```bash
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
 cp .env.example .env        # заполнить три обязательные переменные
-set -a; . ./.env; set +a
-.venv/bin/python refwatch.py
-```
-
-При старте бот шлёт в Telegram сообщение «refwatch запущен». Если его нет, проверьте токен и chat id.
-
-## Сервис на хосте (systemd)
-
-Склонируйте репозиторий в `/opt/refwatch`, создайте там `.venv` и `.env` как выше, затем:
-
-```bash
-sudo cp deploy/refwatch.service /etc/systemd/system/
-sudo systemctl daemon-reload
-sudo systemctl enable --now refwatch
-journalctl -u refwatch -f
+.venv/bin/python main.py
 ```
 
 ## Настройки
